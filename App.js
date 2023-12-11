@@ -1,21 +1,37 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ImageBackground } from 'react-native';
-import * as Animatable from 'react-native-animatable';
-import axios from 'axios';
-import CustomToast from './screens/CustomToast'; // Import the CustomToast component
+import React, { useState, useEffect, useRef } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  ImageBackground,
+} from "react-native";
+import * as Animatable from "react-native-animatable";
+import axios from "axios";
+import CustomToast from "./screens/CustomToast";
+import image from "./assets/farmart.png";
+import { Picker } from "native-base"; // Import Picker from native-base
+import SelectDropdown from "react-native-select-dropdown";
 
 export default function App() {
-  const [message, setMessage] = useState('');
-  const [feedbackMessage, setFeedbackMessage] = useState('');
-  const [animationType, setAnimationType] = useState('fadeIn');
-  const [toastMessage, setToastMessage] = useState('');
-
+  const [message, setMessage] = useState("");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [animationType, setAnimationType] = useState("fadeIn");
+  const [toastMessage, setToastMessage] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState([
+    { label: "Apple", value: "apple" },
+    { label: "Banana", value: "banana" },
+  ]);
   const emoji1Ref = useRef(null);
   const emoji2Ref = useRef(null);
   const emoji3Ref = useRef(null);
+  const countries = ["Egypt", "Canada", "Australia", "Ireland"];
 
   useEffect(() => {
-    setAnimationType('fadeIn');
+    setAnimationType("fadeIn");
     const intervalId = setInterval(() => {
       vibrateEmojis();
     }, 2000);
@@ -30,41 +46,42 @@ export default function App() {
 
     try {
       const response = await axios.post(
-        'https://sheet.best/api/sheets/c11f1220-d748-4bde-a7bb-9266d21bd0b8',
+        "https://sheet.best/api/sheets/c11f1220-d748-4bde-a7bb-9266d21bd0b8",
         {
           emoji_name: emoji,
+          department: selectedDepartment,
           date: `${day}/${month}/${year}`,
           time: `${currentDate.toLocaleTimeString()}`,
-        },
+        }
       );
 
       if (response.status === 200) {
         switch (emoji) {
-          case '😊':
+          case "😊":
             setFeedbackMessage("Be Happy EveryDay Buddy");
             break;
-          case '😐':
+          case "😐":
             setFeedbackMessage("Be Silent like a Spring");
             break;
-          case '😢':
+          case "😢":
             setFeedbackMessage("Don't Be Sad Buddy, This Time Will Also Pass");
             break;
           default:
-            setFeedbackMessage('');
+            setFeedbackMessage("");
         }
-        setToastMessage('Thanks For Your Feedback');
+        setToastMessage("Thanks For Your Feedback");
       } else {
-        setToastMessage('Error submitting feedback');
+        setToastMessage("Error submitting feedback");
       }
     } catch (error) {
-      console.error('Error submitting feedback:', error.message);
-      setToastMessage('Error submitting feedback');
+      console.error("Error submitting feedback:", error.message);
+      setToastMessage("Error submitting feedback");
     }
 
     setTimeout(() => {
-      setToastMessage('');
-      setMessage('');
-      setFeedbackMessage('');
+      setToastMessage("");
+      setMessage("");
+      setFeedbackMessage("");
     }, 5000);
   };
 
@@ -75,47 +92,72 @@ export default function App() {
   };
 
   return (
-    <ImageBackground
-    source={{ uri: 'https://img.freepik.com/premium-vector/smart-farming-concept-with-farmer-use-tablet-monitor-farm-technology-data_25147-1240.jpg' }}
-      style={styles.container}
-    >
+    <ImageBackground source={image} style={styles.container}>
       <Animatable.View animation="fadeIn" style={styles.headerContainer}>
         <Text style={styles.headerText}>
-          Welcome to FarMart Office. {'\n'}
+          Welcome to FarMart Office. {"\n"}
           Building Good Food Economy
         </Text>
       </Animatable.View>
 
-      <Animatable.View animation={animationType} style={styles.greetingContainer}>
+      <Animatable.View
+        animation={animationType}
+        style={styles.greetingContainer}
+      >
         <Text style={styles.greetingText}>How is your mood today?</Text>
+        <SelectDropdown
+          data={countries}
+          onSelect={(selectedItem, index) => {
+            console.log(selectedItem, index);
+          }}
+          buttonTextAfterSelection={(selectedItem, index) => {
+          return selectedItem;
+          }}
+          rowTextForSelection={(item, index) => {
+          return item;
+          }}
+          style={styles.departmentPicker}
+        />
       </Animatable.View>
 
       <View style={styles.emojiContainer}>
-        <TouchableOpacity onPress={() => showMessage('😊')}>
-          <Animatable.Text ref={emoji1Ref} animation="swing" style={styles.emojiTextHappy}>
+        <TouchableOpacity onPress={() => showMessage("😊")}>
+          <Animatable.Text
+            ref={emoji1Ref}
+            animation="swing"
+            style={styles.emojiTextHappy}
+          >
             😊
           </Animatable.Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => showMessage('😐')}>
-          <Animatable.Text ref={emoji3Ref} animation="swing" style={styles.emojiTextNormal}>
+        <TouchableOpacity onPress={() => showMessage("😐")}>
+          <Animatable.Text
+            ref={emoji3Ref}
+            animation="swing"
+            style={styles.emojiTextNormal}
+          >
             😐
           </Animatable.Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => showMessage('😢')}>
-          <Animatable.Text ref={emoji2Ref} animation="swing" style={styles.emojiTextSad}>
+        <TouchableOpacity onPress={() => showMessage("😢")}>
+          <Animatable.Text
+            ref={emoji2Ref}
+            animation="swing"
+            style={styles.emojiTextSad}
+          >
             😢
           </Animatable.Text>
         </TouchableOpacity>
-        {feedbackMessage !== '' && (
+        {feedbackMessage !== "" && (
           <View style={styles.feedbackMessageContainer}>
             <Text style={styles.feedbackMessageText}>{feedbackMessage}</Text>
           </View>
         )}
       </View>
 
-      {toastMessage !== '' && <CustomToast message={toastMessage} />}
+      {toastMessage !== "" && <CustomToast message={toastMessage} />}
     </ImageBackground>
   );
 }
@@ -123,92 +165,82 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#005A54',
-    
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#005A54",
   },
   headerContainer: {
-    backgroundColor: 'white',
     padding: 20,
     marginBottom: 20,
-    alignItems: 'center',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 3,
-    elevation: 5,
+    alignItems: "center",
   },
   headerText: {
     fontSize: 24,
-    color: '#388E3C',
-    textAlign: 'center',
+    color: "#fff",
+    textAlign: "center",
   },
   emojiContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginBottom: 20,
-    position: 'relative',
+    position: "relative",
   },
   emojiTextHappy: {
     fontSize: 50,
     margin: 10,
-    backgroundColor: 'green',
+    backgroundColor: "#005A54",
     borderRadius: 50,
     padding: 20,
   },
   emojiTextNormal: {
     fontSize: 50,
     margin: 10,
-    backgroundColor: 'lightblue',
+    backgroundColor: "#005A54",
     borderRadius: 50,
     padding: 20,
   },
   emojiTextSad: {
     fontSize: 50,
     margin: 10,
-    backgroundColor: 'red',
+    backgroundColor: "#005A54",
     borderRadius: 50,
     padding: 20,
   },
   greetingContainer: {
-    backgroundColor: '#388E3C',
     padding: 20,
     marginTop: 20,
-    alignItems: 'center',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.5,
-    shadowRadius: 3,
-    elevation: 5,
+    alignItems: "center",
   },
   messageContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 10,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   messageText: {
     fontSize: 20,
-    color: '#FFF',
-    textAlign: 'center',
+    color: "#FFF",
+    textAlign: "center",
   },
   feedbackMessageContainer: {
-    position: 'absolute',
+    position: "absolute",
     top: 130,
-    backgroundColor: 'transparent',
-  
-    
+    backgroundColor: "transparent",
   },
   feedbackMessageText: {
     fontSize: 20,
-    color: '#FFF',
-    textAlign: 'center',
-
+    color: "#FFF",
+    textAlign: "center",
   },
   greetingText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 20,
+  },
+  departmentPicker: {
+    height: 50,
+    width: 100,
+    marginBottom: 20,
+    backgroundColor: "black", // Set your desired background color
+    color: "#fff",
+    zIndex: 1000,
   },
 });
