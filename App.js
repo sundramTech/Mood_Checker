@@ -10,7 +10,7 @@ import * as Animatable from "react-native-animatable";
 import axios from "axios";
 import CustomToast from "./screens/CustomToast";
 import image from "./assets/farmart.png";
-import { Picker } from "native-base"; // Import Picker from native-base
+import { Picker } from "native-base";
 import SelectDropdown from "react-native-select-dropdown";
 
 export default function App() {
@@ -19,12 +19,7 @@ export default function App() {
   const [animationType, setAnimationType] = useState("fadeIn");
   const [toastMessage, setToastMessage] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState(null);
-  const [items, setItems] = useState([
-    { label: "Apple", value: "apple" },
-    { label: "Banana", value: "banana" },
-  ]);
+
   const emoji1Ref = useRef(null);
   const emoji2Ref = useRef(null);
   const emoji3Ref = useRef(null);
@@ -39,9 +34,17 @@ export default function App() {
   }, []);
 
   const showMessage = async (emoji) => {
+    if (!selectedDepartment) {
+      setToastMessage("Please select your department");
+      setTimeout(()=>{
+        setToDefault()
+      },2000)
+      return;
+    }
+
     var currentDate = new Date();
     var day = currentDate.getDate();
-    var month = currentDate.getMonth() + 1; // Months are zero-based
+    var month = currentDate.getMonth() + 1;
     var year = currentDate.getFullYear();
 
     try {
@@ -70,19 +73,26 @@ export default function App() {
             setFeedbackMessage("");
         }
         setToastMessage("Thanks For Your Feedback");
+        setTimeout(()=>{
+          setToDefault()
+        },2000)
       } else {
         setToastMessage("Error submitting feedback");
       }
     } catch (error) {
       console.error("Error submitting feedback:", error.message);
       setToastMessage("Error submitting feedback");
+      setTimeout(()=>{
+        setToDefault()
+      },2000)
     }
 
-    setTimeout(() => {
+
+    function setToDefault(){
       setToastMessage("");
       setMessage("");
       setFeedbackMessage("");
-    }, 5000);
+    }
   };
 
   const vibrateEmojis = () => {
@@ -104,17 +114,17 @@ export default function App() {
         animation={animationType}
         style={styles.greetingContainer}
       >
-        <Text style={styles.greetingText}>How is your mood today?</Text>
+        <Text style={styles.greetingText}>How is your mood toda?</Text>
         <SelectDropdown
           data={countries}
           onSelect={(selectedItem, index) => {
-            console.log(selectedItem, index);
+            setSelectedDepartment(selectedItem);
           }}
-          buttonTextAfterSelection={(selectedItem, index) => {
-          return selectedItem;
+          buttonTextAfterSelection={(selectedItem , index) => {
+            return selectedItem|| 'Choose Your Department'
           }}
           rowTextForSelection={(item, index) => {
-          return item;
+            return item;
           }}
           style={styles.departmentPicker}
         />
@@ -211,16 +221,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignItems: "center",
   },
-  messageContainer: {
-    position: "absolute",
-    bottom: 10,
-    backgroundColor: "transparent",
-  },
-  messageText: {
-    fontSize: 20,
-    color: "#FFF",
-    textAlign: "center",
-  },
   feedbackMessageContainer: {
     position: "absolute",
     top: 130,
@@ -236,10 +236,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   departmentPicker: {
+    flex: 1,
     height: 50,
-    width: 100,
     marginBottom: 20,
-    backgroundColor: "black", // Set your desired background color
+    backgroundColor: "black",
     color: "#fff",
     zIndex: 1000,
   },
