@@ -5,13 +5,13 @@ import {
   View,
   TouchableOpacity,
   ImageBackground,
+  ScrollView,
 } from "react-native";
 import * as Animatable from "react-native-animatable";
 import axios from "axios";
 import CustomToast from "./screens/CustomToast";
 import image from "./assets/farmart.png";
-import { Picker } from "native-base";
-import SelectDropdown from "react-native-select-dropdown";
+import Modal from "react-native-modal";
 
 export default function App() {
   const [message, setMessage] = useState("");
@@ -19,11 +19,12 @@ export default function App() {
   const [animationType, setAnimationType] = useState("fadeIn");
   const [toastMessage, setToastMessage] = useState("");
   const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [isModalVisible, setModalVisible] = useState(false);
 
   const emoji1Ref = useRef(null);
   const emoji2Ref = useRef(null);
   const emoji3Ref = useRef(null);
-  const countries = ["Egypt", "Canada", "Australia", "Ireland"];
+  const department = ["Technology","Procurement", "Sales", "Vas", "Human Capital", "Marketing", "Finance", "Data Science", "Product", "Impact-ESG","CEO Office","Export","Spices"];
 
   useEffect(() => {
     setAnimationType("fadeIn");
@@ -36,9 +37,9 @@ export default function App() {
   const showMessage = async (emoji) => {
     if (!selectedDepartment) {
       setToastMessage("Please select your department");
-      setTimeout(()=>{
-        setToDefault()
-      },2000)
+      setTimeout(() => {
+        setToDefault();
+      }, 2000);
       return;
     }
 
@@ -51,12 +52,16 @@ export default function App() {
       const response = await axios.post(
         "https://sheet.best/api/sheets/c11f1220-d748-4bde-a7bb-9266d21bd0b8",
         {
+          
           emoji_name: emoji,
           department: selectedDepartment,
           date: `${day}/${month}/${year}`,
           time: `${currentDate.toLocaleTimeString()}`,
         }
+        
       );
+      
+
 
       if (response.status === 200) {
         switch (emoji) {
@@ -73,25 +78,25 @@ export default function App() {
             setFeedbackMessage("");
         }
         setToastMessage("Thanks For Your Feedback");
-        setTimeout(()=>{
-          setToDefault()
-        },2000)
+        setTimeout(() => {
+          setToDefault();
+        }, 2000);
       } else {
         setToastMessage("Error submitting feedback");
       }
     } catch (error) {
       console.error("Error submitting feedback:", error.message);
       setToastMessage("Error submitting feedback");
-      setTimeout(()=>{
-        setToDefault()
-      },2000)
+      setTimeout(() => {
+        setToDefault();
+      }, 2000);
     }
 
-
-    function setToDefault(){
+    function setToDefault() {
       setToastMessage("");
       setMessage("");
       setFeedbackMessage("");
+      setModalVisible(false); // Close the modal after submitting feedback
     }
   };
 
@@ -106,57 +111,45 @@ export default function App() {
       <Animatable.View animation="fadeIn" style={styles.headerContainer}>
         <Text style={styles.headerText}>
           Welcome to FarMart Office. {"\n"}
-          Building Good Food Economy
+         
         </Text>
       </Animatable.View>
 
-      <Animatable.View
-        animation={animationType}
-        style={styles.greetingContainer}
-      >
-        <Text style={styles.greetingText}>How is your mood toda?</Text>
-        <SelectDropdown
-          data={countries}
-          onSelect={(selectedItem, index) => {
-            setSelectedDepartment(selectedItem);
-          }}
-          buttonTextAfterSelection={(selectedItem , index) => {
-            return selectedItem|| 'Choose Your Department'
-          }}
-          rowTextForSelection={(item, index) => {
-            return item;
-          }}
-          style={styles.departmentPicker}
-        />
+      <Animatable.View animation={animationType} style={styles.greetingContainer}>
+        <Text style={styles.greetingText}>How is your mood today?</Text>
+        <TouchableOpacity onPress={() => setModalVisible(true)}>
+          <View style={styles.departmentPicker}>
+            <Text style={styles.dropdownButtonText}>{selectedDepartment || 'Choose Your Department'}</Text>
+          </View>
+        </TouchableOpacity>
+        <Modal isVisible={isModalVisible} onBackdropPress={() => setModalVisible(false)}>
+          <View style={styles.modalContent}>
+            <ScrollView>
+              {department.map((item) => (
+                <TouchableOpacity key={item} onPress={() => { setSelectedDepartment(item); setModalVisible(false); }}>
+                  <Text style={styles.modalItem}>{item}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </Modal>
       </Animatable.View>
 
       <View style={styles.emojiContainer}>
         <TouchableOpacity onPress={() => showMessage("😊")}>
-          <Animatable.Text
-            ref={emoji1Ref}
-            animation="swing"
-            style={styles.emojiTextHappy}
-          >
+          <Animatable.Text ref={emoji1Ref} animation="swing" style={styles.emojiTextHappy}>
             😊
           </Animatable.Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => showMessage("😐")}>
-          <Animatable.Text
-            ref={emoji3Ref}
-            animation="swing"
-            style={styles.emojiTextNormal}
-          >
+          <Animatable.Text ref={emoji3Ref} animation="swing" style={styles.emojiTextNormal}>
             😐
           </Animatable.Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => showMessage("😢")}>
-          <Animatable.Text
-            ref={emoji2Ref}
-            animation="swing"
-            style={styles.emojiTextSad}
-          >
+          <Animatable.Text ref={emoji2Ref} animation="swing" style={styles.emojiTextSad}>
             😢
           </Animatable.Text>
         </TouchableOpacity>
@@ -185,9 +178,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerText: {
-    fontSize: 24,
+    fontSize: 30,
     color: "#fff",
     textAlign: "center",
+    display:"flex",
+    top:50,
   },
   emojiContainer: {
     flexDirection: "row",
@@ -198,21 +193,21 @@ const styles = StyleSheet.create({
   emojiTextHappy: {
     fontSize: 50,
     margin: 10,
-    backgroundColor: "#005A54",
+    
     borderRadius: 50,
     padding: 20,
   },
   emojiTextNormal: {
     fontSize: 50,
     margin: 10,
-    backgroundColor: "#005A54",
+    
     borderRadius: 50,
     padding: 20,
   },
   emojiTextSad: {
     fontSize: 50,
     margin: 10,
-    backgroundColor: "#005A54",
+   
     borderRadius: 50,
     padding: 20,
   },
@@ -236,11 +231,38 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   departmentPicker: {
-    flex: 1,
-    height: 50,
-    marginBottom: 20,
-    backgroundColor: "black",
-    color: "#fff",
-    zIndex: 1000,
+    width: 200,
+    marginTop: 10,
+    marginLeft: 10,
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#005A54",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingRight: 10,
+  },
+  dropdownButtonText: {
+    fontSize: 16,
+    color: "#005A54",
+  },
+  modalContent: {
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    padding: 20,
+    margin: 20,
+    maxHeight: 300,
+    display:'flex',
+    top:250,
+    height:400,
+
+  },
+  modalItem: {
+    fontSize: 18,
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#EAEAEA',
   },
 });
