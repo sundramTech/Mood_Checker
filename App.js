@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#005A54",
+    backgroundColor: "#005A54",  
   },
   headerContainer: {
     padding: 20,
@@ -178,11 +178,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerText: {
-    fontSize: 30,
+    fontSize: 60,
     color: "#fff",
     textAlign: "center",
     display:"flex",
-    top:50,
+    top:0,
   },
   emojiContainer: {
     flexDirection: "row",
@@ -191,25 +191,25 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   emojiTextHappy: {
-    fontSize: 50,
-    margin: 10,
+    fontSize: 60,
+    margin: 20,
     
     borderRadius: 50,
-    padding: 20,
+    padding: 40,
   },
   emojiTextNormal: {
-    fontSize: 50,
-    margin: 10,
+    fontSize: 60,
+    margin: 20,
     
     borderRadius: 50,
-    padding: 20,
+    padding: 40,
   },
   emojiTextSad: {
-    fontSize: 50,
-    margin: 10,
+    fontSize: 60,
+    margin: 20,
    
     borderRadius: 50,
-    padding: 20,
+    padding: 40,
   },
   greetingContainer: {
     padding: 20,
@@ -228,20 +228,23 @@ const styles = StyleSheet.create({
   },
   greetingText: {
     color: "#FFF",
-    fontSize: 20,
+    fontSize: 40,
+    display:"flex",
+    bottom:80,
+
   },
   departmentPicker: {
-    width: 200,
+    width: 350,
     marginTop: 10,
-    marginLeft: 10,
+    marginLeft: 0,
     backgroundColor: "#FFF",
     borderRadius: 10,
     padding: 10,
     borderWidth: 1,
-    borderColor: "#005A54",
+    borderColor: "black",
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  
+    justifyContent: "center",
     paddingRight: 10,
   },
   dropdownButtonText: {
@@ -252,17 +255,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderRadius: 10,
     padding: 20,
-    margin: 20,
-    maxHeight: 300,
-    display:'flex',
-    top:250,
-    height:400,
-
+    margin: -40,
+    maxHeight: 500,
+    height: 500,
+    display: 'flex',
+    top: "32%",
+    
   },
   modalItem: {
-    fontSize: 18,
+    fontSize: 25,
     padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#EAEAEA',
+    display:"flex",
+    justifyContent:"center"
   },
 });
