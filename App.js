@@ -52,17 +52,12 @@ export default function App() {
       const response = await axios.post(
         "https://sheet.best/api/sheets/80b67088-65fd-439a-9e91-99c449c976b9",
         {
-           
           emoji_name: emoji,
           department: selectedDepartment,
           date: `${day}/${month}/${year}`,
           time: `${currentDate.toLocaleTimeString()}`,
         }
-        
-      );
-      
-
-
+      )
       if (response.status === 200) {
         switch (emoji) {
           case "😊":
